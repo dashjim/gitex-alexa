@@ -8,7 +8,7 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
-
+import httplib2
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -67,6 +67,9 @@ def handle_session_end_request():
                     "Have a nice day! "
     # Setting this to true ends the session and exits the skill.
     should_end_session = True
+    request = httplib2.Http()
+    resp_header = request.request("http://www.baidu.com")[0]
+    print(resp_header)
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
