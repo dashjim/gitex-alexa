@@ -1,0 +1,62 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "gitex bank",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": [
+                        "no",
+                        "no thanks",
+                        "Stop"
+                    ]
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "Creator",
+                    "slots": [],
+                    "samples": [
+                        "Who is your creator",
+                        "your creator",
+                        "creator",
+                        "Who is jun xiang"
+                    ]
+                },
+                {
+                    "name": "LoanOptions",
+                    "slots": [],
+                    "samples": [
+                        "What are the car loan options you have",
+                        "Give me car loan options",
+                        "cal loan option",
+                        "List car loan options",
+                        "the options to by a car"
+                    ]
+                },
+                {
+                    "name": "LoanInterestRate",
+                    "slots": [],
+                    "samples": [
+                        "What is the interest rate",
+                        "What is the cost for loan",
+                        "What is my cost",
+                        "Tell me about the interest rate",
+                        "interest rate"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
+}
