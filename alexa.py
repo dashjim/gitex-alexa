@@ -8,7 +8,7 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
-import requests
+import http.client
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -76,19 +76,25 @@ def handle_session_end_request():
 
 
 def requestED():
-    url = "http://135.27.132.224/services/EventingConnector/events"
 
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\"I don’t want to.\", phoneNumber:\"+12345677\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+    conn = http.client.HTTPConnection("135.27.132.224")
+
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\"I do not want to.\", phoneNumber:\"+12345677\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
         'Content-Type': "application/x-www-form-urlencoded",
         'Cache-Control': "no-cache",
-        'Postman-Token': "cffab257-a3a1-4560-b37a-832074659198"
-     }
+        'Postman-Token': "67abf3fb-2b5d-472c-ae2b-63ea37a90df8"
+        }
 
-    response = requests.request("POST", url, data=payload, headers=headers)
+    conn.request("POST", "/services/EventingConnector/events", payload, headers)
 
-    print("reponse text from ED: " + response.text)
+    res = conn.getresponse()
+    data = res.read()
+
+    print(data.decode("utf-8"))
+
 
 def create_favorite_color_attributes(favorite_color):
     return {"favoriteColor": favorite_color}
