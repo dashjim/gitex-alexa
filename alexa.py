@@ -92,6 +92,7 @@ def get_response_for_car_loan_options_intent(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+
 def get_response_for_creator_intent(intent, session):
 
     card_title = intent['name']
@@ -103,7 +104,6 @@ def get_response_for_creator_intent(intent, session):
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
-
 
 
 def get_response_for_loan_interest_intent(intent, session):
