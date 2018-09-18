@@ -57,6 +57,18 @@
                         "Tell me about the interest rate",
                         "interest rate"
                     ]
+                },
+                {
+                    "name": "number",
+                    "slots": [{
+                          "name": "phoneNumbuer",
+                          "type": "AMAZON.NUMBER",
+                          "samples": []
+                        }],
+                    "samples": [
+                        "My phone number is {phoneNumbuer}",
+                        "{phoneNumbuer}"
+                    ]
                 }
             ],
             "types": []

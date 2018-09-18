@@ -9,9 +9,11 @@ http://amzn.to/1LGWsLG
 
 from __future__ import print_function
 import http.client
+import json
 
 # --------------- Helpers that build all of the responses ----------------------
 session_store = {}
+phone_number_store = {}
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
@@ -70,7 +72,7 @@ def handle_session_end_request( sid ):
     should_end_session = True
 
     # Request ED URL
-    requestED()
+    requestED(sid)
 
     del session_store[sid]
 
@@ -78,11 +80,11 @@ def handle_session_end_request( sid ):
         card_title, speech_output, None, should_end_session))
 
 
-def requestED():
+def requestED( sid ):
 
     conn = http.client.HTTPConnection("135.27.132.224")
 
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\"I do not want to.\", phoneNumber:\"+12345677\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\""+ session_store[sid] +"\", phoneNumber:\""+ phone_number_store[sid] +"\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -145,6 +147,29 @@ def get_response_for_loan_interest_intent(intent, session):
         card_title, speech_output, reprompt_text, should_end_session))
 
 
+def extract_phone_number(intent):
+    if 'slots' in intent:
+        slots = intent['slots']
+        for key, val in slots.items():
+            if val.get('value'):
+                if (val.get('value')).isdigit():
+                    return int(val['value'].lower())
+    return 0
+
+
+def get_response_for_number_intent(intent):
+
+    card_title = intent['name']
+    session_attributes = {}
+    should_end_session = True
+
+    speech_output = "Thank you for providing the phone number. We will contact you ASAP."
+    reprompt_text = "We received your phone number, and will contact you now. "
+
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+
 def get_response_for_error_intent(intent, session):
 
     card_title = intent['name']
@@ -199,6 +224,10 @@ def on_intent(intent_request, session):
     elif intent_name == "LoanInterestRate":
         session_store[session['sessionId']].append("ask for loan interest rate")
         return get_response_for_loan_interest_intent(intent, session)
+    elif intent_name == "number":
+        session_store[session['sessionId']].append("customer phone number is: " + extract_phone_number(intent) )
+        phone_number_store[session['sessionId']] = extract_phone_number(intent)
+        return get_response_for_number_intent(intent)
     elif intent_name == "AMAZON.FallbackIntent":
         session_store[session['sessionId']].append("fall back intent")
         return get_response_for_error_intent(intent, session)
