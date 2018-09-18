@@ -135,8 +135,8 @@ def get_response_for_loan_interest_intent(intent, session):
     should_end_session = False
 
     speech_output = "The interest rate is ranging from 5% to 8% per year accroding to your previous record. " \
-                    "Do you want to know more details?"
-    reprompt_text = "The interest rate is ranging from 5% to 8% per year. " \
+                    "Please tell us your phone number to provid more deatils for you."
+    reprompt_text = "The interest rate is ranging from 10% to 15% per year. Please provide your phone number for us to callback."
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -219,6 +219,7 @@ def lambda_handler(event, context):
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
 
+    print(event)
     """
     Uncomment this if statement and populate with your skill's application ID to
     prevent someone else from configuring a skill that sends requests to this
