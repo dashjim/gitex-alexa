@@ -11,6 +11,7 @@ from __future__ import print_function
 import http.client
 
 # --------------- Helpers that build all of the responses ----------------------
+session_store = {}
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
@@ -61,7 +62,7 @@ def get_welcome_response():
         card_title, speech_output, reprompt_text, should_end_session))
 
 
-def handle_session_end_request():
+def handle_session_end_request( sid ):
     card_title = "Session Ended"
     speech_output = "Thank you for using our service. " \
                     "Have a nice day! "
@@ -70,6 +71,8 @@ def handle_session_end_request():
 
     # Request ED URL
     requestED()
+
+    del session_store[sid]
 
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
@@ -185,17 +188,23 @@ def on_intent(intent_request, session):
 
     # Dispatch to your skill's intent handlers
     if intent_name == "AMAZON.HelpIntent":
+        session_store[session['sessionId']] = ["enter skill"]
         return get_welcome_response()
     elif intent_name == "LoanOptions":
+        session_store[session['sessionId']].append("ask for car loan options")
         return get_response_for_car_loan_options_intent(intent, session)
     elif intent_name == "Creator":
+        session_store[session['sessionId']].append("ask for creator")
         return get_response_for_creator_intent(intent, session)
     elif intent_name == "LoanInterestRate":
+        session_store[session['sessionId']].append("ask for loan interest rate")
         return get_response_for_loan_interest_intent(intent, session)
     elif intent_name == "AMAZON.FallbackIntent":
+        session_store[session['sessionId']].append("fall back intent")
         return get_response_for_error_intent(intent, session)
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
-        return handle_session_end_request()
+        session_store[session['sessionId']].append("stop intent")
+        return handle_session_end_request(session['sessionId'])
     else:
         raise ValueError("Invalid intent")
 
