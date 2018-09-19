@@ -58,7 +58,7 @@ def get_welcome_response():
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Welcome to Gitex Bank, " \
-                    "Do you need car loan?"
+                    "What can I help? "
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -213,9 +213,18 @@ def on_intent(intent_request, session):
 
     # Dispatch to your skill's intent handlers
     if intent_name == "AMAZON.HelpIntent":
-        session_store[session['sessionId']] = ["enter skill"]
+        if(session_store.get(session['sessionId']) == None):
+            session_store[session['sessionId']] = ["enter skill"]
+        else:
+            session_store[session['sessionId']].append("enter skill")
+
         return get_welcome_response()
     elif intent_name == "LoanOptions":
+        if(session_store.get(session['sessionId']) == None):
+            session_store[session['sessionId']] = ["ask for car loan options"]
+        else:
+            session_store[session['sessionId']].append("ask for car loan options")
+
         session_store[session['sessionId']].append("ask for car loan options")
         return get_response_for_car_loan_options_intent(intent, session)
     elif intent_name == "Creator":
