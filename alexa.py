@@ -72,7 +72,8 @@ def handle_session_end_request( sid ):
     should_end_session = True
 
     # Request ED URL
-    requestED(sid)
+    # requestED(sid)
+    # requestPOM(sid)
 
     del session_store[sid]
 
@@ -84,7 +85,7 @@ def requestED( sid ):
 
     conn = http.client.HTTPConnection("135.27.132.224")
 
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\""+ session_store[sid] +"\", phoneNumber:\""+ phone_number_store[sid] +"\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\""+ json.dumps(session_store[sid]) +"\", phoneNumber:\""+ json.dumps(phone_number_store[sid]) +"\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -94,6 +95,28 @@ def requestED( sid ):
         }
 
     conn.request("POST", "/services/EventingConnector/events", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    print(data.decode("utf-8"))
+
+def requestPOM(sid):
+
+    conn = http.client.HTTPConnection("1ebf15d3.ngrok.io")
+
+    payload = json.dumps(session_store[sid])
+    print("sid: " + sid)
+    print(session_store)
+    print("payload -  "+ payload)
+
+    headers = {
+        'Content-Type': "text/plain",
+        'Cache-Control': "no-cache",
+        'Postman-Token': "728de7fc-958b-4f56-92bd-11cf4b89b6e9"
+        }
+
+    conn.request("POST", "/v1/echo", payload, headers)
 
     res = conn.getresponse()
     data = res.read()
@@ -157,7 +180,7 @@ def extract_phone_number(intent):
     return 0
 
 
-def get_response_for_number_intent(intent):
+def get_response_for_number_intent(intent, sid):
 
     card_title = intent['name']
     session_attributes = {}
@@ -165,6 +188,9 @@ def get_response_for_number_intent(intent):
 
     speech_output = "Thank you for providing the phone number. We will contact you ASAP."
     reprompt_text = "We received your phone number, and will contact you now. "
+
+    requestPOM(sid)
+    # requestED(sid)
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -236,7 +262,7 @@ def on_intent(intent_request, session):
     elif intent_name == "number":
         session_store[session['sessionId']].append("customer phone number is: " + extract_phone_number(intent) )
         phone_number_store[session['sessionId']] = extract_phone_number(intent)
-        return get_response_for_number_intent(intent)
+        return get_response_for_number_intent(intent, session['sessionId'])
     elif intent_name == "AMAZON.FallbackIntent":
         session_store[session['sessionId']].append("fall back intent")
         return get_response_for_error_intent(intent, session)
@@ -286,4 +312,5 @@ def lambda_handler(event, context):
         return on_intent(event['request'], event['session'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
+
 
