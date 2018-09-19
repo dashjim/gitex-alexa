@@ -139,8 +139,8 @@ def get_response_for_loan_interest_intent(intent, session):
     session_attributes = {}
     should_end_session = False
 
-    speech_output = "The interest rate is ranging from 5% to 8% per year accroding to your previous record. " \
-                    "Please tell us your phone number to provid more deatils for you."
+    speech_output = "The interest rate is ranging from 10% to 15% per year accroding to your previous record. " \
+                    "Please tell us your phone number to provid more details for you."
     reprompt_text = "The interest rate is ranging from 10% to 15% per year. Please provide your phone number for us to callback."
 
     return build_response(session_attributes, build_speechlet_response(
@@ -153,7 +153,7 @@ def extract_phone_number(intent):
         for key, val in slots.items():
             if val.get('value'):
                 if (val.get('value')).isdigit():
-                    return int(val['value'].lower())
+                    return val['value'].lower()
     return 0
 
 
