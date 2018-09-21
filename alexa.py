@@ -85,7 +85,8 @@ def requestED( sid ):
 
     conn = http.client.HTTPConnection("94.207.38.203")
 
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\""+ json.dumps(session_store[sid]) +"\", phoneNumber:\""+ json.dumps(phone_number_store[sid]) +"\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\",
+    lastConversation:\""Car_loan_interest_rate "\", phoneNumber:\""+ json.dumps(phone_number_store[sid]) +"\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -189,8 +190,8 @@ def get_response_for_number_intent(intent, sid):
     speech_output = "Thank you for providing the phone number. We will contact you ASAP."
     reprompt_text = "We received your phone number, and will contact you now. "
 
-    requestPOM(sid)
-    # requestED(sid)
+    # requestPOM(sid)
+    requestED(sid)
 
     del session_store[sid]
     del phone_number_store[sid]
