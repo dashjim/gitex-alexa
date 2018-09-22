@@ -100,6 +100,7 @@ def requestED( sid ):
 
     print(data.decode("utf-8"))
     print(res.status)
+    print(payload)
 
 def requestPOM(sid):
 
