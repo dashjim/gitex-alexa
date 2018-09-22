@@ -85,11 +85,10 @@ def requestED( sid ):
 
     conn = http.client.HTTPConnection("94.207.38.203")
 
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\"Car_loan_interest_rate\", phoneNumber:\""+ json.dumps(phone_number_store[sid]) +"\", UserName:\"Jim Test\"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{carLoan:{intent:\"carLoan\", lastConversation:\""+ session_store[sid] + "\", phoneNumber:\""+ phone_number_store[sid] +"\", UserName:\"Jim \"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
-        'Content-Type': "application/x-www-form-urlencoded",
         'Cache-Control': "no-cache",
         'Postman-Token': "67abf3fb-2b5d-472c-ae2b-63ea37a90df8"
         }
@@ -100,6 +99,7 @@ def requestED( sid ):
     data = res.read()
 
     print(data.decode("utf-8"))
+    print(res.status)
 
 def requestPOM(sid):
 
