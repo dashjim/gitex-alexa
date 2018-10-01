@@ -53,8 +53,8 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Welcome"
-    speech_output = "Welcome to Gitex Bank. " \
-                    "What can I help? "
+    speech_output = "Welcome to Beyond Bank.  Please tell me your User Name."
+
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Welcome to Gitex Bank, " \
@@ -66,8 +66,8 @@ def get_welcome_response():
 
 def handle_session_end_request( sid ):
     card_title = "Session Ended"
-    speech_output = "Thank you for using our service. " \
-                    "Have a nice day! "
+    speech_output = "bye  "
+
     # Setting this to true ends the session and exits the skill.
     should_end_session = True
 
@@ -85,7 +85,7 @@ def requestED( sid ):
 
     conn = http.client.HTTPConnection("94.207.38.203")
 
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"carLoan\":{\"intent\":\"carLoan\", \"lastConversation\":"+ json.dumps(session_store[sid]) + ", \"phoneNumber\":"+ json.dumps(phone_number_store[sid]) +", \"UserName\":\"Jim \"}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":"+ json.dumps(session_store[sid]) + ", \"phoneNumber\":"+ json.dumps(phone_number_store[sid]) +", \"UserName\":\"Jim \"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -135,10 +135,34 @@ def get_response_for_car_loan_options_intent(intent, session):
     session_attributes = {}
     should_end_session = False
 
-    speech_output = "We provid car loans for different time period. " \
-                    "From 6 months to 3 years. " \
-                    "Do you want to know more details?"
-    reprompt_text = "We have car loans from 6 months to 3 years. " \
+    speech_output = "For existing Beyond Bank customers we can offer rates from as low as 4.5%.  Would you like to speak to an advisor about your options?  "
+    reprompt_text = "For existing Beyond Bank customers we can offer rates from as low as 4.5%.  Would you like to speak to an advisor about your options?  "
+
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+
+def get_response_for_name(intent, session):
+
+    card_title = intent['name']
+    session_attributes = {}
+    should_end_session = False
+
+    speech_output = "Thank you.  A 4-digit verification code has been sent to your mobile. Please read out the code."
+    reprompt_text = "Thank you.  A 4-digit verification code has been sent to your mobile. Please read out the code."
+
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+
+def get_response_for_code(intent, session):
+
+    card_title = intent['name']
+    session_attributes = {}
+    should_end_session = False
+
+    speech_output = "Thank you John.  You are now verified. How can I help? "
+    reprompt_text = "Thank you John.  You are now verified. How can I help?"
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -187,8 +211,8 @@ def get_response_for_number_intent(intent, sid):
     session_attributes = {}
     should_end_session = True
 
-    speech_output = "Thank you for providing the phone number. We will contact you ASAP."
-    reprompt_text = "We received your phone number, and will contact you now. "
+    speech_output = "Great.  An advisor will call your mobile within the next couple of minutes. Thank you."
+    reprompt_text = "Great.  An advisor will call your mobile within the next couple of minutes. Thank you."
 
     # requestPOM(sid)
     requestED(sid)
@@ -254,21 +278,31 @@ def on_intent(intent_request, session):
         else:
             session_store[session['sessionId']].append("ask for car loan options")
         return get_response_for_car_loan_options_intent(intent, session)
+    elif intent_name == "name":
+        if(session_store.get(session['sessionId']) == None):
+            session_store[session['sessionId']] = ["enter skill and get user name."]
+        else:
+            session_store[session['sessionId']].append("enter skill and get user name.")
+        return get_response_for_name(intent, session)
     elif intent_name == "Creator":
         session_store[session['sessionId']].append("ask for creator")
         return get_response_for_creator_intent(intent, session)
+    elif intent_name == "code":
+        session_store[session['sessionId']].append("received verification code.")
+        return get_response_for_code(intent, session)
     elif intent_name == "LoanInterestRate":
         session_store[session['sessionId']].append("ask for loan interest rate")
         return get_response_for_loan_interest_intent(intent, session)
-    elif intent_name == "number":
-        session_store[session['sessionId']].append("customer phone number is: " + extract_phone_number(intent) )
+    elif intent_name == "number" or intent_name == "agent":
+        session_store[session['sessionId']].append("callback to customer ")
         phone_number_store[session['sessionId']] = extract_phone_number(intent)
         return get_response_for_number_intent(intent, session['sessionId'])
     elif intent_name == "AMAZON.FallbackIntent":
         session_store[session['sessionId']].append("fall back intent")
         return get_response_for_error_intent(intent, session)
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
-        session_store[session['sessionId']].append("stop intent")
+        session_store[session['sessionId']].append("stop intent - no thanks")
+        print("received session end event.")
         return handle_session_end_request(session['sessionId'])
     else:
         raise ValueError("Invalid intent")

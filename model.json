@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "gitex bank",
+            "invocationName": "byond bank",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -24,6 +24,31 @@
                     "samples": []
                 },
                 {
+                    "name": "name",
+                    "slots": [],
+                    "samples": [
+                        "my user name is John M.",
+                        "my name is John M.",
+                        "John M."
+                    ]
+                },
+                {
+                    "name": "agent",
+                    "slots": [],
+                    "samples": [
+                        "I want to speak to an advisor.",
+                        "I want to talk to an advisor."
+                    ]
+                },
+                {
+                    "name": "code",
+                    "slots": [],
+                    "samples": [
+                        "my code is 1234",
+                        "1234"
+                    ]
+                },
+                {
                     "name": "Creator",
                     "slots": [],
                     "samples": [
@@ -41,6 +66,7 @@
                         "Give me car loan options",
                         "cal loan option",
                         "List car loan options",
+                        "What are your Car Loan rates?",
                         "the options to buy a car"
                     ]
                 },
