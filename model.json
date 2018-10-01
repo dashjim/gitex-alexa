@@ -42,10 +42,15 @@
                 },
                 {
                     "name": "code",
-                    "slots": [],
+                    "slots": [
+                        {
+                            "name": "pin",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
                     "samples": [
-                        "my code is 1234",
-                        "1234"
+                        "my code is {pin}",
+                        "code is {pin}"
                     ]
                 },
                 {
@@ -66,7 +71,7 @@
                         "Give me car loan options",
                         "cal loan option",
                         "List car loan options",
-                        "What are your Car Loan rates?",
+                        "What are your Car Loan rates",
                         "the options to buy a car"
                     ]
                 },
