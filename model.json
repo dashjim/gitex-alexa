@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "byond bank",
+            "invocationName": "beyond bank",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -16,7 +16,8 @@
                     "samples": [
                         "no",
                         "no thanks",
-                        "Stop"
+                        "Stop",
+                        "Ok Thank you."
                     ]
                 },
                 {

@@ -57,8 +57,8 @@ def get_welcome_response():
 
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Welcome to Gitex Bank, " \
-                    "What can I help? "
+    reprompt_text = "Welcome to Beyond Bank.  Please tell me your User Name."
+
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -72,7 +72,7 @@ def handle_session_end_request( sid ):
     should_end_session = True
 
     # Request ED URL
-    # requestED(sid)
+    requestED(sid)
     # requestPOM(sid)
 
     del session_store[sid]
