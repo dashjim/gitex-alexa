@@ -14,6 +14,7 @@ import json
 # --------------- Helpers that build all of the responses ----------------------
 session_store = {}
 phone_number_store = {}
+customer_number_for_SMS = "971505592712"
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
@@ -81,6 +82,29 @@ def handle_session_end_request( sid ):
         card_title, speech_output, None, should_end_session))
 
 
+def requestSMS():
+
+    conn = http.client.HTTPConnection("94.207.38.203")
+    # json.dumps(phone_number_store[sid])
+    number = "0"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nHTTPSendSMS\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nHTTP\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1.0\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\n  \"Phone\": \"971505592712\",\n  \"Flow\": \"3\",\n\"Text\": \"[1234] This is our verification code from Beyond Bank.\"\n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+
+    headers = {
+        'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+        'Cache-Control': "no-cache",
+        'Postman-Token': "8942795a-cb2a-48a3-817f-89dd549fbffe"
+        }
+
+    conn.request("POST", "/services/EventingConnector/events", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    print(data.decode("utf-8"))
+    print(res.status)
+    print(payload)
+
+
 def requestED( sid ):
 
     conn = http.client.HTTPConnection("94.207.38.203")
@@ -102,6 +126,7 @@ def requestED( sid ):
     print(data.decode("utf-8"))
     print(res.status)
     print(payload)
+
 
 def requestPOM(sid):
 
@@ -285,6 +310,8 @@ def on_intent(intent_request, session):
             session_store[session['sessionId']] = ["enter skill and get user name."]
         else:
             session_store[session['sessionId']].append("enter skill and get user name.")
+
+        requestSMS()
         return get_response_for_name(intent, session)
     elif intent_name == "Creator":
         session_store[session['sessionId']].append("ask for creator")
