@@ -84,8 +84,9 @@ def handle_session_end_request( sid ):
 def requestED( sid ):
 
     conn = http.client.HTTPConnection("94.207.38.203")
-
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":"+ json.dumps(session_store[sid]) + ", \"phoneNumber\":"+ json.dumps(phone_number_store[sid]) +", \"UserName\":\"Jim \"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+    # json.dumps(phone_number_store[sid])
+    number = "0"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":"+ json.dumps(session_store[sid]) + ", \"phoneNumber\":"+ number +", \"UserName\":\"Jim \"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -263,6 +264,7 @@ def on_intent(intent_request, session):
 
     intent = intent_request['intent']
     intent_name = intent_request['intent']['name']
+    print("intent id is: " + intent_name)
 
     # Dispatch to your skill's intent handlers
     if intent_name == "AMAZON.HelpIntent":
