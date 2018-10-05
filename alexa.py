@@ -255,9 +255,9 @@ def extract_user_name(intent):
         slots = intent['slots']
         for key, val in slots.items():
             if val.get('value'):
-                if 'Sally' in (val.get('value')):
+                if 'Sally' in (val.get('value')) or 'sally' in (val.get('value')):
                     return 'Sally'
-                elif 'John' in (val.get('value')):
+                elif 'John' in (val.get('value')) or 'john' in (val.get('value')):
                     return 'John'
     return "no_name"
 
@@ -360,8 +360,8 @@ def on_intent(intent_request, session):
             session_store[sid_].append("enter skill and get user name.")
 
         cust_name = extract_user_name(intent)
-        if cust_name not in customer_numbers.has_key(cust_name):
-            return get_user_name_response(intent, session)
+        if cust_name not in customer_numbers:
+            return get_user_name_response()
         user_name_store[sid_] = cust_name
         session_store[sid_].append(cust_name)
         requestSMS(customer_numbers[cust_name], SMS_BODY_PIN)
@@ -445,3 +445,12 @@ def lambda_handler(event, context):
         return on_intent(event['request'], event['session'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
+
+
+def main():
+    e = {'version': '1.0', 'session': {'new': False, 'sessionId': 'amzn1.echo-api.session.c26228a1-58fe-4af4-8de5-9b2d473514b4', 'application': {'applicationId': 'amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03'}, 'user': {'userId': 'amzn1.ask.account.AE4ZM7LSTJ2DDGGGHVHHWIRDAM6USZIYN4B4F76VQIMEDZVLP23YDPGM7AMUYANKUCYITWERERQBA2XJDKMICZFYPJYAZ6WHFQIQDBI7EMAYUIKJ5E5IBM4NBMAZVK6LYA567D5GLSQMHGU7FUF6IZUWER52ERK2HRZVKXPJBJFUVTLETQQEAHOSQ5LCLPNKZA2AVS6OVWNKFQA'}}, 'context': {'System': {'application': {'applicationId': 'amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03'}, 'user': {'userId': 'amzn1.ask.account.AE4ZM7LSTJ2DDGGGHVHHWIRDAM6USZIYN4B4F76VQIMEDZVLP23YDPGM7AMUYANKUCYITWERERQBA2XJDKMICZFYPJYAZ6WHFQIQDBI7EMAYUIKJ5E5IBM4NBMAZVK6LYA567D5GLSQMHGU7FUF6IZUWER52ERK2HRZVKXPJBJFUVTLETQQEAHOSQ5LCLPNKZA2AVS6OVWNKFQA'}, 'device': {'deviceId': 'amzn1.ask.device.AEVLHZKFCP2JKA5652BP7BBWM24747OKUXZIP32VRBSMTERUNTNGXQ47GLI4X3XGORQ7K5BRLJZHW25BW46DGLZ3OQ3YMVHZTT55FBMOWMOZTBV6FOZRQTPRRJOKCYDF54OWARVTNV5F2TQAWREI2FO5XTNWATUHS66KSMJTA6K5D42H67GNC', 'supportedInterfaces': {}}, 'apiEndpoint': 'https://api.amazonalexa.com', 'apiAccessToken': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjk5Mzg3ZjBhLTdjMGMtNDk1OC05ZTZiLTk1OGQwMGUzNWUwMyIsImV4cCI6MTUzODczMzI4MiwiaWF0IjoxNTM4NzI5NjgyLCJuYmYiOjE1Mzg3Mjk2ODIsInByaXZhdGVDbGFpbXMiOnsiY29uc2VudFRva2VuIjpudWxsLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQUVWTEhaS0ZDUDJKS0E1NjUyQlA3QkJXTTI0NzQ3T0tVWFpJUDMyVlJCU01URVJVTlROR1hRNDdHTEk0WDNYR09SUTdLNUJSTEpaSFcyNUJXNDZER0xaM09RM1lNVkhaVFQ1NUZCTU9XTU9aVEJWNkZPWlJRVFBSUkpPS0NZREY1NE9XQVJWVE5WNUYyVFFBV1JFSTJGTzVYVE5XQVRVSFM2NktTTUpUQTZLNUQ0Mkg2N0dOQyIsInVzZXJJZCI6ImFtem4xLmFzay5hY2NvdW50LkFFNFpNN0xTVEoyRERHR0dIVkhIV0lSREFNNlVTWklZTjRCNEY3NlZRSU1FRFpWTFAyM1lEUEdNN0FNVVlBTktVQ1lJVFdFUkVSUUJBMlhKREtNSUNaRllQSllBWjZXSEZRSVFEQkk3RU1BWVVJS0o1RTVJQk00TkJNQVpWSzZMWUE1NjdENUdMU1FNSEdVN0ZVRjZJWlVXRVI1MkVSSzJIUlpWS1hQSkJKRlVWVExFVFFRRUFIT1NRNUxDTFBOS1pBMkFWUzZPVldOS0ZRQSJ9fQ.g_ZkPbiHNXx0QdyaokgLoSOepKfow-7tDjCaCBh3ug22cbj7GAZc8HlK2PvCPi7xGELG6jK8mGopjV_4l3v_cGj3-AXn8KCAV0_v8ZHVNeOMURhp6SRSrt5JGMNhCHEl03IsAXZYfZsGYK3cqy9NmyC-En1NH5iuleye78QBUFBxz1V3X2QsR501s9nMCDhfysZpkmueyz76WfOW0X1ZmN52OutkwLlLy2nUDuQlYqMjghoRxpqOQRlV0sqUBI4Jscnm_riaejjLdY2Dam_AMPUWk5ONjY7g_K4Q_T6ovmFJ3E1J9ULMQ15Kx3o10_cHNCAVjaTAiCFA4Jsq9q7DgQ'}}, 'request': {'type': 'IntentRequest', 'requestId': 'amzn1.echo-api.request.f54888af-0058-4843-9f03-d33f9b6da5e9', 'timestamp': '2018-10-05T08:54:42Z', 'locale': 'en-US', 'intent': {'name': 'name', 'confirmationStatus': 'NONE', 'slots': {'humanName': {'name': 'humanName', 'value': 'sally', 'resolutions': {'resolutionsPerAuthority': [{'authority': 'amzn1.er-authority.echo-sdk.amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03.AMAZON.US_FIRST_NAME', 'status': {'code': 'ER_SUCCESS_MATCH'}, 'values': [{'value': {'name': 'Sally', 'id': '3fa8b9cc38915ca488e412b59a8aaa79'}}, {'value': {'name': 'Sally S', 'id': '0144aea78a8beea0953087d9d0ca08a0'}}, {'value': {'name': 'Sally S.', 'id': 'd9076509281d4194b47e513d3d2d1ede'}}]}]}, 'confirmationStatus': 'NONE'}}}}}
+    lambda_handler(e, None)
+
+
+if __name__ == "__main__":
+    main()
