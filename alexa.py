@@ -16,7 +16,7 @@ session_store = {}
 phone_number_store = {}
 user_name_store = {}
 customer_number_for_SMS = "971505592712"
-customer_numbers = {"Sally": "971505592712", "John": "971566826036"}
+customer_numbers = {"Sara": "971505592712", "Peter": "971566826036"}
 SMS_BODY_PIN = '[1234] This is the verification code from Beyond Bank.'
 SMS_BODY_VIDEO = 'Change me - I am a video sms body.'
 
@@ -255,10 +255,10 @@ def extract_user_name(intent):
         slots = intent['slots']
         for key, val in slots.items():
             if val.get('value'):
-                if 'Sally' in (val.get('value')) or 'sally' in (val.get('value')):
-                    return 'Sally'
-                elif 'John' in (val.get('value')) or 'john' in (val.get('value')):
-                    return 'John'
+                if 'Sara' in (val.get('value')) or 'sara' in (val.get('value')):
+                    return 'Sara'
+                elif 'Peter' in (val.get('value')) or 'peter' in (val.get('value')):
+                    return 'peter'
     return "no_name"
 
 
