@@ -81,9 +81,13 @@ def handle_session_end_request(sid, number='0', name="no_name"):
     requestED(sid, number, name)
     # requestPOM(sid)
 
-    del session_store[sid]
-    del phone_number_store[sid]
-    del user_name_store[sid]
+    try:
+        del session_store[sid]
+        del phone_number_store[sid]
+        del user_name_store[sid]
+    except:
+        print("ERROR: exception is clear session data.")
+
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
@@ -116,16 +120,15 @@ def requestSMS(sms_number='0', body='no_body'):
 
 
 def requestED(sid, number="0", user_name="no_name"):
-
     conn = http.client.HTTPConnection("94.207.38.203")
     # json.dumps(phone_number_store[sid])
     payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\n" \
               "GitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"" \
               "\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;" \
               " name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: " \
-              "form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":"\
+              "form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":" \
               + json.dumps(session_store[sid]) + ", \"phoneNumber\":" + number + ", \"UserName\":" + user_name + "}" \
-              "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+                                                                                                                 "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -263,9 +266,12 @@ def get_response_for_number_intent(intent, sid, number="0", name='no_name'):
     # requestPOM(sid)
     requestED(sid, number, name)
 
-    del session_store[sid]
-    del phone_number_store[sid]
-    del user_name_store[sid]
+    try:
+        del session_store[sid]
+        del phone_number_store[sid]
+        del user_name_store[sid]
+    except:
+        print("ERROR in clear session.")
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
