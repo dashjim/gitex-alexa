@@ -14,7 +14,12 @@ import json
 # --------------- Helpers that build all of the responses ----------------------
 session_store = {}
 phone_number_store = {}
+user_name_store = {}
 customer_number_for_SMS = "971505592712"
+customer_numbers = {"Sally": "971566826036", "John": "971505592712"}
+SMS_BODY_PIN = '[1234] This is the verification code from Beyond Bank.'
+SMS_BODY_VIDEO = 'Change me - I am a video sms body.'
+
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
@@ -65,7 +70,7 @@ def get_welcome_response():
         card_title, speech_output, reprompt_text, should_end_session))
 
 
-def handle_session_end_request( sid ):
+def handle_session_end_request(sid):
     card_title = "Session Ended"
     speech_output = "bye  "
 
@@ -77,17 +82,23 @@ def handle_session_end_request( sid ):
     # requestPOM(sid)
 
     del session_store[sid]
+    del phone_number_store[sid]
 
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
 
-def requestSMS():
+def requestSMS(sms_number='0', body='no_body'):
 
     conn = http.client.HTTPConnection("94.207.38.203")
     # json.dumps(phone_number_store[sid])
     number = "0"
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nHTTPSendSMS\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nHTTP\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1.0\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\n  \"Phone\": \"971505592712\",\n  \"Flow\":\"3\",\n\"Text\": \"[1234] This is the verification code from Beyond Bank.\"\n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\n" \
+              "HTTPSendSMS\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; " \
+              "name=\"type\"\r\n\r\nHTTP\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: " \
+              "form-data; name=\"version\"\r\n\r\n1.0\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition:" \
+              " form-data; name=\"eventBody\"\r\n\r\n{\n  \"Phone\":" + sms_number + ",\n  \"Flow\":\"3\",\n\"" \
+              "Text\":" + body + " \n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -221,6 +232,17 @@ def get_response_for_loan_interest_intent(intent, session):
         card_title, speech_output, reprompt_text, should_end_session))
 
 
+def extract_user_name(intent):
+    if 'slots' in intent:
+        slots = intent['slots']
+        for key, val in slots.items():
+            if val.get('value'):
+                if 'Sally' in (val.get('value')):
+                    return 'Sally'
+                elif 'John' in (val.get('value')):
+                    return 'John'
+    return "no_name"
+
 def extract_phone_number(intent):
     if 'slots' in intent:
         slots = intent['slots']
@@ -237,8 +259,8 @@ def get_response_for_number_intent(intent, sid):
     session_attributes = {}
     should_end_session = True
 
-    speech_output = "Great.  An advisor will call your mobile within the next couple of minutes. Thank you."
-    reprompt_text = "Great.  An advisor will call your mobile within the next couple of minutes. Thank you."
+    speech_output = "Great.  An adviser will call your mobile within the next couple of minutes. Thank you."
+    reprompt_text = "Great.  An adviser will call your mobile within the next couple of minutes. Thank you."
 
     # requestPOM(sid)
     requestED(sid)
@@ -311,7 +333,10 @@ def on_intent(intent_request, session):
         else:
             session_store[session['sessionId']].append("enter skill and get user name.")
 
-        requestSMS()
+        cust_name = extract_user_name(intent)
+        user_name_store[session['sessionId']] = cust_name
+        session_store[session['sessionId']].append(cust_name)
+        requestSMS(customer_numbers[cust_name], SMS_BODY_PIN)
         return get_response_for_name(intent, session)
     elif intent_name == "Creator":
         session_store[session['sessionId']].append("ask for creator")
@@ -325,6 +350,10 @@ def on_intent(intent_request, session):
     elif intent_name == "number" or intent_name == "agent":
         session_store[session['sessionId']].append("callback to customer ")
         phone_number_store[session['sessionId']] = extract_phone_number(intent)
+
+        current_user = user_name_store[session['sessionId']]
+        print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
+        requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return get_response_for_number_intent(intent, session['sessionId'])
     elif intent_name == "AMAZON.FallbackIntent":
         session_store[session['sessionId']].append("fall back intent")
@@ -332,6 +361,9 @@ def on_intent(intent_request, session):
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         session_store[session['sessionId']].append("stop intent - no thanks")
         print("received session end event.")
+        current_user = user_name_store[session['sessionId']]
+        print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
+        requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return handle_session_end_request(session['sessionId'])
     else:
         raise ValueError("Invalid intent")

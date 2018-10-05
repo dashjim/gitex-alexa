@@ -17,7 +17,8 @@
                         "no",
                         "no thanks",
                         "Stop",
-                        "Ok Thank you."
+                        "ok thank you",
+                        "thank you"
                     ]
                 },
                 {
@@ -26,11 +27,16 @@
                 },
                 {
                     "name": "name",
-                    "slots": [],
+                    "slots": [
+                        {
+                            "name": "humanName",
+                            "type": "AMAZON.US_FIRST_NAME"
+                        }
+                    ],
                     "samples": [
-                        "my user name is John M.",
-                        "my name is John M.",
-                        "John M."
+                        "my user name is {humanName}",
+                        "my name is {humanName}",
+                        "{humanName}"
                     ]
                 },
                 {
@@ -92,18 +98,49 @@
                 },
                 {
                     "name": "number",
-                    "slots": [{
-                          "name": "phoneNumbuer",
-                          "type": "AMAZON.NUMBER",
-                          "samples": []
-                        }],
+                    "slots": [
+                        {
+                            "name": "phoneNumbuer",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
                     "samples": [
                         "My phone number is {phoneNumbuer}",
                         "{phoneNumbuer}"
                     ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
                 }
             ],
-            "types": []
+            "types": [
+                {
+                    "name": "AMAZON.US_FIRST_NAME",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "John M."
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "john"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Sara"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "john m"
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     }
 }
