@@ -431,7 +431,7 @@ def on_intent(intent_request, session):
         # print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         # requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return handle_session_end_request(sid_, customer_numbers[current_user], current_user)
-     else:
+    else:
         raise ValueError("Invalid intent")
 
 
