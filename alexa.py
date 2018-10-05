@@ -16,7 +16,7 @@ session_store = {}
 phone_number_store = {}
 user_name_store = {}
 customer_number_for_SMS = "971505592712"
-customer_numbers = {"Sally": "971566826036", "John": "971505592712"}
+customer_numbers = {"Sally": "971505592712", "John": "971566826036"}
 SMS_BODY_PIN = '[1234] This is the verification code from Beyond Bank.'
 SMS_BODY_VIDEO = 'Change me - I am a video sms body.'
 
@@ -64,6 +64,23 @@ def get_welcome_response():
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Welcome to Beyond Bank.  Please tell me your User Name."
+
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+def get_user_name_response():
+    """ If we wanted to initialize the session to have some attributes we could
+    add those here
+    """
+
+    session_attributes = {}
+    card_title = "name please"
+    speech_output = "Do not have that user.  Please tell me your User Name."
+
+    # If the user either does not reply to the welcome message or says something
+    # that is not understood, they will be prompted again with this text.
+    reprompt_text = "Do not have that user.  Please tell me your User Name."
 
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
@@ -343,6 +360,8 @@ def on_intent(intent_request, session):
             session_store[sid_].append("enter skill and get user name.")
 
         cust_name = extract_user_name(intent)
+        if cust_name not in customer_numbers.has_key(cust_name):
+            return get_user_name_response(intent, session)
         user_name_store[sid_] = cust_name
         session_store[sid_].append(cust_name)
         requestSMS(customer_numbers[cust_name], SMS_BODY_PIN)
@@ -365,8 +384,8 @@ def on_intent(intent_request, session):
         phone_number_store[sid_] = extract_phone_number(intent)
 
         current_user = user_name_store[sid_]
-        print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
-        requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
+        # print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
+        # requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return get_response_for_number_intent(intent, sid_, customer_numbers[current_user], current_user)
 
     elif intent_name == "AMAZON.FallbackIntent":
@@ -380,8 +399,8 @@ def on_intent(intent_request, session):
         session_store[sid_].append("stop intent - no thanks")
         print("received session end event.")
         current_user = user_name_store[sid_]
-        print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
-        requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
+        # print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
+        # requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return handle_session_end_request(sid_, customer_numbers[current_user], current_user)
     else:
         raise ValueError("Invalid intent")
