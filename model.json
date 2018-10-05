@@ -18,7 +18,9 @@
                         "no thanks",
                         "Stop",
                         "ok thank you",
-                        "thank you"
+                        "ok thanks",
+                        "thank you",
+                        "thanks"
                     ]
                 },
                 {
@@ -56,6 +58,7 @@
                         }
                     ],
                     "samples": [
+                        "{pin}",
                         "my code is {pin}",
                         "code is {pin}"
                     ]
@@ -105,8 +108,8 @@
                         }
                     ],
                     "samples": [
-                        "My phone number is {phoneNumbuer}",
-                        "{phoneNumbuer}"
+                        "phone number is {phoneNumbuer}",
+                        "My phone number is {phoneNumbuer}"
                     ]
                 },
                 {
@@ -118,6 +121,21 @@
                 {
                     "name": "AMAZON.US_FIRST_NAME",
                     "values": [
+                        {
+                            "name": {
+                                "value": "Sally"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Sally S."
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Sally S"
+                            }
+                        },
                         {
                             "name": {
                                 "value": "John M."
