@@ -70,7 +70,7 @@ def get_welcome_response():
         card_title, speech_output, reprompt_text, should_end_session))
 
 
-def handle_session_end_request(sid):
+def handle_session_end_request(sid, number='0'):
     card_title = "Session Ended"
     speech_output = "bye  "
 
@@ -78,18 +78,17 @@ def handle_session_end_request(sid):
     should_end_session = True
 
     # Request ED URL
-    requestED(sid)
+    requestED(sid, number)
     # requestPOM(sid)
 
     del session_store[sid]
     del phone_number_store[sid]
-
+    del user_name_store[sid]
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
 
 def requestSMS(sms_number='0', body='no_body'):
-
     conn = http.client.HTTPConnection("94.207.38.203")
     # json.dumps(phone_number_store[sid])
     number = "0"
@@ -98,13 +97,13 @@ def requestSMS(sms_number='0', body='no_body'):
               "name=\"type\"\r\n\r\nHTTP\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: " \
               "form-data; name=\"version\"\r\n\r\n1.0\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition:" \
               " form-data; name=\"eventBody\"\r\n\r\n{\n  \"Phone\":" + sms_number + ",\n  \"Flow\":\"3\",\n\"" \
-              "Text\":" + body + " \n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+                                                                                     "Text\":" + body + " \n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
         'Cache-Control': "no-cache",
         'Postman-Token': "8942795a-cb2a-48a3-817f-89dd549fbffe"
-        }
+    }
 
     conn.request("POST", "/services/EventingConnector/events", payload, headers)
 
@@ -116,18 +115,18 @@ def requestSMS(sms_number='0', body='no_body'):
     print(payload)
 
 
-def requestED( sid ):
-
+def requestED(sid, number="0"):
     conn = http.client.HTTPConnection("94.207.38.203")
     # json.dumps(phone_number_store[sid])
-    number = "0"
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":"+ json.dumps(session_store[sid]) + ", \"phoneNumber\":"+ number +", \"UserName\":\"Jim \"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":" + json.dumps(
+        session_store[
+            sid]) + ", \"phoneNumber\":" + number + ", \"UserName\":\"Jim \"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
         'Cache-Control': "no-cache",
         'Postman-Token': "67abf3fb-2b5d-472c-ae2b-63ea37a90df8"
-        }
+    }
 
     conn.request("POST", "/services/EventingConnector/events", payload, headers)
 
@@ -140,19 +139,18 @@ def requestED( sid ):
 
 
 def requestPOM(sid):
-
     conn = http.client.HTTPConnection("1ebf15d3.ngrok.io")
 
     payload = json.dumps(session_store[sid])
     print("sid: " + sid)
     print(session_store)
-    print("payload -  "+ payload)
+    print("payload -  " + payload)
 
     headers = {
         'Content-Type': "text/plain",
         'Cache-Control': "no-cache",
         'Postman-Token': "728de7fc-958b-4f56-92bd-11cf4b89b6e9"
-        }
+    }
 
     conn.request("POST", "/v1/echo", payload, headers)
 
@@ -167,7 +165,6 @@ def create_favorite_color_attributes(favorite_color):
 
 
 def get_response_for_car_loan_options_intent(intent, session):
-
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
@@ -180,7 +177,6 @@ def get_response_for_car_loan_options_intent(intent, session):
 
 
 def get_response_for_name(intent, session):
-
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
@@ -193,7 +189,6 @@ def get_response_for_name(intent, session):
 
 
 def get_response_for_code(intent, session):
-
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
@@ -206,20 +201,18 @@ def get_response_for_code(intent, session):
 
 
 def get_response_for_creator_intent(intent, session):
-
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
 
     speech_output = "My creator is Ji Jun Xiang. "
-    reprompt_text = "Jun Xiang created me. " \
+    reprompt_text = "Jun Xiang created me. "
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
 
 def get_response_for_loan_interest_intent(intent, session):
-
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
@@ -243,6 +236,7 @@ def extract_user_name(intent):
                     return 'John'
     return "no_name"
 
+
 def extract_phone_number(intent):
     if 'slots' in intent:
         slots = intent['slots']
@@ -253,35 +247,36 @@ def extract_phone_number(intent):
     return 0
 
 
-def get_response_for_number_intent(intent, sid):
-
+def get_response_for_number_intent(intent, sid, number=0):
     card_title = intent['name']
     session_attributes = {}
     should_end_session = True
 
-    speech_output = "Great.  An adviser will call your mobile within the next couple of minutes. Thank you."
-    reprompt_text = "Great.  An adviser will call your mobile within the next couple of minutes. Thank you."
+    speech_output = "Great. An adviser will call your mobile within the next couple of minutes. Thank you."
+    reprompt_text = "Great. An adviser will call your mobile within the next couple of minutes. Thank you."
 
     # requestPOM(sid)
-    requestED(sid)
+    requestED(sid, number)
 
     del session_store[sid]
     del phone_number_store[sid]
+    del user_name_store[sid]
+
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
 
 def get_response_for_error_intent(intent, session):
-
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
 
     speech_output = "Sorry, I cannot understand. "
-    reprompt_text = "Sorry, I don't understand. " \
+    reprompt_text = "Sorry, I don't understand. "
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
+
 
 # --------------- Events ------------------
 
@@ -306,8 +301,9 @@ def on_launch(launch_request, session):
 def on_intent(intent_request, session):
     """ Called when the user specifies an intent for this skill """
 
+    sid_ = session['sessionId']
     print("on_intent requestId=" + intent_request['requestId'] +
-          ", sessionId=" + session['sessionId'])
+          ", sessionId=" + sid_)
 
     intent = intent_request['intent']
     intent_name = intent_request['intent']['name']
@@ -315,56 +311,56 @@ def on_intent(intent_request, session):
 
     # Dispatch to your skill's intent handlers
     if intent_name == "AMAZON.HelpIntent":
-        if(session_store.get(session['sessionId']) == None):
-            session_store[session['sessionId']] = ["enter skill"]
+        if session_store.get(sid_) is None:
+            session_store[sid_] = ["enter skill"]
         else:
-            session_store[session['sessionId']].append("enter skill")
+            session_store[sid_].append("enter skill")
 
         return get_welcome_response()
     elif intent_name == "LoanOptions":
-        if(session_store.get(session['sessionId']) == None):
-            session_store[session['sessionId']] = ["ask for car loan options"]
+        if session_store.get(sid_) is None:
+            session_store[sid_] = ["ask for car loan options"]
         else:
-            session_store[session['sessionId']].append("ask for car loan options")
+            session_store[sid_].append("ask for car loan options")
         return get_response_for_car_loan_options_intent(intent, session)
     elif intent_name == "name":
-        if(session_store.get(session['sessionId']) == None):
-            session_store[session['sessionId']] = ["enter skill and get user name."]
+        if session_store.get(sid_) is None:
+            session_store[sid_] = ["enter skill and get user name."]
         else:
-            session_store[session['sessionId']].append("enter skill and get user name.")
+            session_store[sid_].append("enter skill and get user name.")
 
         cust_name = extract_user_name(intent)
-        user_name_store[session['sessionId']] = cust_name
-        session_store[session['sessionId']].append(cust_name)
+        user_name_store[sid_] = cust_name
+        session_store[sid_].append(cust_name)
         requestSMS(customer_numbers[cust_name], SMS_BODY_PIN)
         return get_response_for_name(intent, session)
     elif intent_name == "Creator":
-        session_store[session['sessionId']].append("ask for creator")
+        session_store[sid_].append("ask for creator")
         return get_response_for_creator_intent(intent, session)
     elif intent_name == "code":
-        session_store[session['sessionId']].append("received verification code.")
+        session_store[sid_].append("received verification code.")
         return get_response_for_code(intent, session)
     elif intent_name == "LoanInterestRate":
-        session_store[session['sessionId']].append("ask for loan interest rate")
+        session_store[sid_].append("ask for loan interest rate")
         return get_response_for_loan_interest_intent(intent, session)
     elif intent_name == "number" or intent_name == "agent":
-        session_store[session['sessionId']].append("callback to customer ")
-        phone_number_store[session['sessionId']] = extract_phone_number(intent)
+        session_store[sid_].append("callback to customer ")
+        phone_number_store[sid_] = extract_phone_number(intent)
 
-        current_user = user_name_store[session['sessionId']]
+        current_user = user_name_store[sid_]
         print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
-        return get_response_for_number_intent(intent, session['sessionId'])
+        return get_response_for_number_intent(intent, sid_, customer_numbers[current_user])
     elif intent_name == "AMAZON.FallbackIntent":
-        session_store[session['sessionId']].append("fall back intent")
+        session_store[sid_].append("fall back intent")
         return get_response_for_error_intent(intent, session)
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
-        session_store[session['sessionId']].append("stop intent - no thanks")
+        session_store[sid_].append("stop intent - no thanks")
         print("received session end event.")
-        current_user = user_name_store[session['sessionId']]
+        current_user = user_name_store[sid_]
         print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
-        return handle_session_end_request(session['sessionId'])
+        return handle_session_end_request(sid_, customer_numbers[current_user])
     else:
         raise ValueError("Invalid intent")
 
@@ -408,5 +404,3 @@ def lambda_handler(event, context):
         return on_intent(event['request'], event['session'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
-
-
