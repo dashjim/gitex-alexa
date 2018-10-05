@@ -247,7 +247,7 @@ def extract_phone_number(intent):
     return 0
 
 
-def get_response_for_number_intent(intent, sid, number=0):
+def get_response_for_number_intent(intent, sid, number="0"):
     card_title = intent['name']
     session_attributes = {}
     should_end_session = True
@@ -317,12 +317,14 @@ def on_intent(intent_request, session):
             session_store[sid_].append("enter skill")
 
         return get_welcome_response()
+
     elif intent_name == "LoanOptions":
         if session_store.get(sid_) is None:
             session_store[sid_] = ["ask for car loan options"]
         else:
             session_store[sid_].append("ask for car loan options")
         return get_response_for_car_loan_options_intent(intent, session)
+
     elif intent_name == "name":
         if session_store.get(sid_) is None:
             session_store[sid_] = ["enter skill and get user name."]
@@ -334,15 +336,19 @@ def on_intent(intent_request, session):
         session_store[sid_].append(cust_name)
         requestSMS(customer_numbers[cust_name], SMS_BODY_PIN)
         return get_response_for_name(intent, session)
+
     elif intent_name == "Creator":
         session_store[sid_].append("ask for creator")
         return get_response_for_creator_intent(intent, session)
+
     elif intent_name == "code":
         session_store[sid_].append("received verification code.")
         return get_response_for_code(intent, session)
+
     elif intent_name == "LoanInterestRate":
         session_store[sid_].append("ask for loan interest rate")
         return get_response_for_loan_interest_intent(intent, session)
+
     elif intent_name == "number" or intent_name == "agent":
         session_store[sid_].append("callback to customer ")
         phone_number_store[sid_] = extract_phone_number(intent)
@@ -351,9 +357,14 @@ def on_intent(intent_request, session):
         print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return get_response_for_number_intent(intent, sid_, customer_numbers[current_user])
+
     elif intent_name == "AMAZON.FallbackIntent":
-        session_store[sid_].append("fall back intent")
+        if session_store.get(sid_) is None:
+            session_store[sid_] = ["fall back intent"]
+        else:
+            session_store[sid_].append("fall back intent")
         return get_response_for_error_intent(intent, session)
+
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         session_store[sid_].append("stop intent - no thanks")
         print("received session end event.")
