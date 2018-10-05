@@ -87,7 +87,7 @@ def get_user_name_response():
         card_title, speech_output, reprompt_text, should_end_session))
 
 
-def handle_session_end_request(sid, number='0', name="no_name"):
+def handle_thank_you_call_back(sid, number='0', name="no_name"):
     card_title = "Session Ended"
     speech_output = "bye  "
 
@@ -96,6 +96,28 @@ def handle_session_end_request(sid, number='0', name="no_name"):
 
     # Request ED URL
     requestED(sid, number, name)
+    # requestPOM(sid)
+
+    try:
+        del session_store[sid]
+        del phone_number_store[sid]
+        del user_name_store[sid]
+    except:
+        print("ERROR: exception is clear session data.")
+
+    return build_response({}, build_speechlet_response(
+        card_title, speech_output, None, should_end_session))
+
+
+def handle_session_end_request(sid, number='0', name="no_name"):
+    card_title = "Session Ended"
+    speech_output = "bye  "
+
+    # Setting this to true ends the session and exits the skill.
+    should_end_session = True
+
+    # Request ED URL
+    # requestED(sid, number, name)
     # requestPOM(sid)
 
     try:
@@ -218,8 +240,8 @@ def get_response_for_code(intent, session):
     session_attributes = {}
     should_end_session = False
 
-    speech_output = "Thank you John.  You are now verified. How can I help? "
-    reprompt_text = "Thank you John.  You are now verified. How can I help?"
+    speech_output = "Thank you " + user_name_store[session['sessionId']] + ".  You are now verified. How can I help? "
+    reprompt_text = "Thank you " + user_name_store[session['sessionId']] + ".  You are now verified. How can I help?"
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -258,7 +280,7 @@ def extract_user_name(intent):
                 if 'Sara' in (val.get('value')) or 'sara' in (val.get('value')):
                     return 'Sara'
                 elif 'Peter' in (val.get('value')) or 'peter' in (val.get('value')):
-                    return 'peter'
+                    return 'Peter'
     return "no_name"
 
 
@@ -395,14 +417,21 @@ def on_intent(intent_request, session):
             session_store[sid_].append("fall back intent")
         return get_response_for_error_intent(intent, session)
 
+    elif intent_name == "thank_you_call_back":
+        session_store[sid_].append(" thank you and callback intent")
+        print("received session end event.")
+        current_user = user_name_store[sid_]
+        # print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
+        # requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
+        return handle_thank_you_call_back(sid_, customer_numbers[current_user], current_user)
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
-        session_store[sid_].append("stop intent - no thanks")
+        session_store[sid_].append("stop intent")
         print("received session end event.")
         current_user = user_name_store[sid_]
         # print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         # requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
         return handle_session_end_request(sid_, customer_numbers[current_user], current_user)
-    else:
+     else:
         raise ValueError("Invalid intent")
 
 
@@ -449,7 +478,8 @@ def lambda_handler(event, context):
 
 def main():
     e = {'version': '1.0', 'session': {'new': False, 'sessionId': 'amzn1.echo-api.session.c26228a1-58fe-4af4-8de5-9b2d473514b4', 'application': {'applicationId': 'amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03'}, 'user': {'userId': 'amzn1.ask.account.AE4ZM7LSTJ2DDGGGHVHHWIRDAM6USZIYN4B4F76VQIMEDZVLP23YDPGM7AMUYANKUCYITWERERQBA2XJDKMICZFYPJYAZ6WHFQIQDBI7EMAYUIKJ5E5IBM4NBMAZVK6LYA567D5GLSQMHGU7FUF6IZUWER52ERK2HRZVKXPJBJFUVTLETQQEAHOSQ5LCLPNKZA2AVS6OVWNKFQA'}}, 'context': {'System': {'application': {'applicationId': 'amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03'}, 'user': {'userId': 'amzn1.ask.account.AE4ZM7LSTJ2DDGGGHVHHWIRDAM6USZIYN4B4F76VQIMEDZVLP23YDPGM7AMUYANKUCYITWERERQBA2XJDKMICZFYPJYAZ6WHFQIQDBI7EMAYUIKJ5E5IBM4NBMAZVK6LYA567D5GLSQMHGU7FUF6IZUWER52ERK2HRZVKXPJBJFUVTLETQQEAHOSQ5LCLPNKZA2AVS6OVWNKFQA'}, 'device': {'deviceId': 'amzn1.ask.device.AEVLHZKFCP2JKA5652BP7BBWM24747OKUXZIP32VRBSMTERUNTNGXQ47GLI4X3XGORQ7K5BRLJZHW25BW46DGLZ3OQ3YMVHZTT55FBMOWMOZTBV6FOZRQTPRRJOKCYDF54OWARVTNV5F2TQAWREI2FO5XTNWATUHS66KSMJTA6K5D42H67GNC', 'supportedInterfaces': {}}, 'apiEndpoint': 'https://api.amazonalexa.com', 'apiAccessToken': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjk5Mzg3ZjBhLTdjMGMtNDk1OC05ZTZiLTk1OGQwMGUzNWUwMyIsImV4cCI6MTUzODczMzI4MiwiaWF0IjoxNTM4NzI5NjgyLCJuYmYiOjE1Mzg3Mjk2ODIsInByaXZhdGVDbGFpbXMiOnsiY29uc2VudFRva2VuIjpudWxsLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQUVWTEhaS0ZDUDJKS0E1NjUyQlA3QkJXTTI0NzQ3T0tVWFpJUDMyVlJCU01URVJVTlROR1hRNDdHTEk0WDNYR09SUTdLNUJSTEpaSFcyNUJXNDZER0xaM09RM1lNVkhaVFQ1NUZCTU9XTU9aVEJWNkZPWlJRVFBSUkpPS0NZREY1NE9XQVJWVE5WNUYyVFFBV1JFSTJGTzVYVE5XQVRVSFM2NktTTUpUQTZLNUQ0Mkg2N0dOQyIsInVzZXJJZCI6ImFtem4xLmFzay5hY2NvdW50LkFFNFpNN0xTVEoyRERHR0dIVkhIV0lSREFNNlVTWklZTjRCNEY3NlZRSU1FRFpWTFAyM1lEUEdNN0FNVVlBTktVQ1lJVFdFUkVSUUJBMlhKREtNSUNaRllQSllBWjZXSEZRSVFEQkk3RU1BWVVJS0o1RTVJQk00TkJNQVpWSzZMWUE1NjdENUdMU1FNSEdVN0ZVRjZJWlVXRVI1MkVSSzJIUlpWS1hQSkJKRlVWVExFVFFRRUFIT1NRNUxDTFBOS1pBMkFWUzZPVldOS0ZRQSJ9fQ.g_ZkPbiHNXx0QdyaokgLoSOepKfow-7tDjCaCBh3ug22cbj7GAZc8HlK2PvCPi7xGELG6jK8mGopjV_4l3v_cGj3-AXn8KCAV0_v8ZHVNeOMURhp6SRSrt5JGMNhCHEl03IsAXZYfZsGYK3cqy9NmyC-En1NH5iuleye78QBUFBxz1V3X2QsR501s9nMCDhfysZpkmueyz76WfOW0X1ZmN52OutkwLlLy2nUDuQlYqMjghoRxpqOQRlV0sqUBI4Jscnm_riaejjLdY2Dam_AMPUWk5ONjY7g_K4Q_T6ovmFJ3E1J9ULMQ15Kx3o10_cHNCAVjaTAiCFA4Jsq9q7DgQ'}}, 'request': {'type': 'IntentRequest', 'requestId': 'amzn1.echo-api.request.f54888af-0058-4843-9f03-d33f9b6da5e9', 'timestamp': '2018-10-05T08:54:42Z', 'locale': 'en-US', 'intent': {'name': 'name', 'confirmationStatus': 'NONE', 'slots': {'humanName': {'name': 'humanName', 'value': 'sally', 'resolutions': {'resolutionsPerAuthority': [{'authority': 'amzn1.er-authority.echo-sdk.amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03.AMAZON.US_FIRST_NAME', 'status': {'code': 'ER_SUCCESS_MATCH'}, 'values': [{'value': {'name': 'Sally', 'id': '3fa8b9cc38915ca488e412b59a8aaa79'}}, {'value': {'name': 'Sally S', 'id': '0144aea78a8beea0953087d9d0ca08a0'}}, {'value': {'name': 'Sally S.', 'id': 'd9076509281d4194b47e513d3d2d1ede'}}]}]}, 'confirmationStatus': 'NONE'}}}}}
-    lambda_handler(e, None)
+    e_peter = {'version': '1.0', 'session': {'new': False, 'sessionId': 'amzn1.echo-api.session.a762598c-2a29-40b7-a88f-e06430527b9b', 'application': {'applicationId': 'amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03'}, 'user': {'userId': 'amzn1.ask.account.AE4ZM7LSTJ2DDGGGHVHHWIRDAM6USZIYN4B4F76VQIMEDZVLP23YDPGM7AMUYANKUCYITWERERQBA2XJDKMICZFYPJYAZ6WHFQIQDBI7EMAYUIKJ5E5IBM4NBMAZVK6LYA567D5GLSQMHGU7FUF6IZUWER52ERK2HRZVKXPJBJFUVTLETQQEAHOSQ5LCLPNKZA2AVS6OVWNKFQA'}}, 'context': {'System': {'application': {'applicationId': 'amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03'}, 'user': {'userId': 'amzn1.ask.account.AE4ZM7LSTJ2DDGGGHVHHWIRDAM6USZIYN4B4F76VQIMEDZVLP23YDPGM7AMUYANKUCYITWERERQBA2XJDKMICZFYPJYAZ6WHFQIQDBI7EMAYUIKJ5E5IBM4NBMAZVK6LYA567D5GLSQMHGU7FUF6IZUWER52ERK2HRZVKXPJBJFUVTLETQQEAHOSQ5LCLPNKZA2AVS6OVWNKFQA'}, 'device': {'deviceId': 'amzn1.ask.device.AEVLHZKFCP2JKA5652BP7BBWM24747OKUXZIP32VRBSMTERUNTNGXQ47GLI4X3XGORQ7K5BRLJZHW25BW46DGLZ3OQ3YMVHZTT55FBMOWMOZTBV6FOZRQTPRRJOKCYDF54OWARVTNV5F2TQAWREI2FO5XTNWATUHS66KSMJTA6K5D42H67GNC', 'supportedInterfaces': {}}, 'apiEndpoint': 'https://api.amazonalexa.com', 'apiAccessToken': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjk5Mzg3ZjBhLTdjMGMtNDk1OC05ZTZiLTk1OGQwMGUzNWUwMyIsImV4cCI6MTUzODc0NzE1MiwiaWF0IjoxNTM4NzQzNTUyLCJuYmYiOjE1Mzg3NDM1NTIsInByaXZhdGVDbGFpbXMiOnsiY29uc2VudFRva2VuIjpudWxsLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQUVWTEhaS0ZDUDJKS0E1NjUyQlA3QkJXTTI0NzQ3T0tVWFpJUDMyVlJCU01URVJVTlROR1hRNDdHTEk0WDNYR09SUTdLNUJSTEpaSFcyNUJXNDZER0xaM09RM1lNVkhaVFQ1NUZCTU9XTU9aVEJWNkZPWlJRVFBSUkpPS0NZREY1NE9XQVJWVE5WNUYyVFFBV1JFSTJGTzVYVE5XQVRVSFM2NktTTUpUQTZLNUQ0Mkg2N0dOQyIsInVzZXJJZCI6ImFtem4xLmFzay5hY2NvdW50LkFFNFpNN0xTVEoyRERHR0dIVkhIV0lSREFNNlVTWklZTjRCNEY3NlZRSU1FRFpWTFAyM1lEUEdNN0FNVVlBTktVQ1lJVFdFUkVSUUJBMlhKREtNSUNaRllQSllBWjZXSEZRSVFEQkk3RU1BWVVJS0o1RTVJQk00TkJNQVpWSzZMWUE1NjdENUdMU1FNSEdVN0ZVRjZJWlVXRVI1MkVSSzJIUlpWS1hQSkJKRlVWVExFVFFRRUFIT1NRNUxDTFBOS1pBMkFWUzZPVldOS0ZRQSJ9fQ.W8lC0ntUDvZ9J1XY2UBiDlijDNoqDDV0bVkfxOeayjnDlgbgWbKbwikMzJ2h-9eEhMdGUWNiHIyf8wlEkZq4jGv1jyIBLWEIuRZWO52JLRQGF2H6Z8EbX5uUFAho49iMW663nemmzCV6LNjZ7QXUfzLAWNZdT4Z1ym3IuOvv_iTCs4Ugv-FZz9wTL-OWZbWmrNkVdmiBO5QVOKNbkGjBk7fnB-sFqfRBvH5YmswxM6qb-7uHDzb-vudF-kg126T-X32I1T9PuTnQ8SNCtquU8R-h9OZHUuj1Z74bJzmdg26D5Z_YR26syrLNydq6LGtlizNRERrMGaRJSghd8BPimw'}}, 'request': {'type': 'IntentRequest', 'requestId': 'amzn1.echo-api.request.d336c203-cac3-4943-9870-ffff8391cf90', 'timestamp': '2018-10-05T12:45:52Z', 'locale': 'en-US', 'intent': {'name': 'name', 'confirmationStatus': 'NONE', 'slots': {'humanName': {'name': 'humanName', 'value': 'peter pan', 'resolutions': {'resolutionsPerAuthority': [{'authority': 'amzn1.er-authority.echo-sdk.amzn1.ask.skill.99387f0a-7c0c-4958-9e6b-958d00e35e03.AMAZON.US_FIRST_NAME', 'status': {'code': 'ER_SUCCESS_MATCH'}, 'values': [{'value': {'name': 'Peter Pan', 'id': 'b1f7e8c5c5d12670675975e769ec11b9'}}]}]}, 'confirmationStatus': 'NONE'}}}}}
+    lambda_handler(e_peter, None)
 
 
 if __name__ == "__main__":
