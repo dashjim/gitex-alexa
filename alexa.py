@@ -70,7 +70,7 @@ def get_welcome_response():
         card_title, speech_output, reprompt_text, should_end_session))
 
 
-def handle_session_end_request(sid, number='0'):
+def handle_session_end_request(sid, number='0', name="no_name"):
     card_title = "Session Ended"
     speech_output = "bye  "
 
@@ -78,7 +78,7 @@ def handle_session_end_request(sid, number='0'):
     should_end_session = True
 
     # Request ED URL
-    requestED(sid, number)
+    requestED(sid, number, name)
     # requestPOM(sid)
 
     del session_store[sid]
@@ -115,12 +115,17 @@ def requestSMS(sms_number='0', body='no_body'):
     print(payload)
 
 
-def requestED(sid, number="0"):
+def requestED(sid, number="0", user_name="no_name"):
+
     conn = http.client.HTTPConnection("94.207.38.203")
     # json.dumps(phone_number_store[sid])
-    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\nGitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":" + json.dumps(
-        session_store[
-            sid]) + ", \"phoneNumber\":" + number + ", \"UserName\":\"Jim \"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+    payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"family\"\r\n\r\n" \
+              "GitexAlexa\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"" \
+              "\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;" \
+              " name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: " \
+              "form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":"\
+              + json.dumps(session_store[sid]) + ", \"phoneNumber\":" + number + ", \"UserName\":" + user_name + "}" \
+              "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -247,7 +252,7 @@ def extract_phone_number(intent):
     return 0
 
 
-def get_response_for_number_intent(intent, sid, number="0"):
+def get_response_for_number_intent(intent, sid, number="0", name='no_name'):
     card_title = intent['name']
     session_attributes = {}
     should_end_session = True
@@ -256,7 +261,7 @@ def get_response_for_number_intent(intent, sid, number="0"):
     reprompt_text = "Great. An adviser will call your mobile within the next couple of minutes. Thank you."
 
     # requestPOM(sid)
-    requestED(sid, number)
+    requestED(sid, number, name)
 
     del session_store[sid]
     del phone_number_store[sid]
@@ -356,7 +361,7 @@ def on_intent(intent_request, session):
         current_user = user_name_store[sid_]
         print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
-        return get_response_for_number_intent(intent, sid_, customer_numbers[current_user])
+        return get_response_for_number_intent(intent, sid_, customer_numbers[current_user], current_user)
 
     elif intent_name == "AMAZON.FallbackIntent":
         if session_store.get(sid_) is None:
@@ -371,7 +376,7 @@ def on_intent(intent_request, session):
         current_user = user_name_store[sid_]
         print("going to send sms for: " + current_user + ", with - " + SMS_BODY_VIDEO)
         requestSMS(customer_numbers[current_user], SMS_BODY_VIDEO)
-        return handle_session_end_request(sid_, customer_numbers[current_user])
+        return handle_session_end_request(sid_, customer_numbers[current_user], current_user)
     else:
         raise ValueError("Invalid intent")
 
