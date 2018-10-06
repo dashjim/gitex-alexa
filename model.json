@@ -19,6 +19,9 @@
                         "Stop",
                         "ok thank you",
                         "ok thanks",
+                        "sure",
+                        "please",
+                        "yes",
                         "thank you",
                         "thanks"
                     ]
@@ -92,9 +95,6 @@
                         "What is the interest rate",
                         "What is the cost for loan",
                         "What is my cost",
-                        "sure",
-                        "please",
-                        "yes",
                         "Tell me about the interest rate",
                         "interest rate"
                     ]

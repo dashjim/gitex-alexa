@@ -1,0 +1,11 @@
+{
+    "intent": "carLoan",
+    "lastConversation": [
+        "enter skill and get user name.",
+        "received verification code.",
+        "ask for car loan options",
+        "callback to customer "
+    ],
+    "phoneNumber": 0,
+    "UserName": "Jim "
+}

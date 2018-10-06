@@ -16,7 +16,7 @@ session_store = {}
 phone_number_store = {}
 user_name_store = {}
 customer_number_for_SMS = "971505592712"
-customer_numbers = {"Sara": "971505592712", "Peter": "971566826036"}
+customer_numbers = {"Sara": "971505592712", "Peter": "971561086668"}
 SMS_BODY_PIN = '[1234] This is the verification code from Beyond Bank.'
 SMS_BODY_VIDEO = 'Change me - I am a video sms body.'
 
@@ -139,8 +139,8 @@ def requestSMS(sms_number='0', body='no_body'):
               "HTTPSendSMS\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; " \
               "name=\"type\"\r\n\r\nHTTP\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: " \
               "form-data; name=\"version\"\r\n\r\n1.0\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition:" \
-              " form-data; name=\"eventBody\"\r\n\r\n{\n  \"Phone\":" + sms_number + ",\n  \"Flow\":\"3\",\n\"" \
-                                                                                     "Text\":" + body + " \n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+              " form-data; name=\"eventBody\"\r\n\r\n{\n  \"Phone\":\"" + sms_number + "\",\n  \"Flow\":\"3\",\n\"" \
+                                                                                     "Text\":\"" + body + "\" \n}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
         'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -166,7 +166,7 @@ def requestED(sid, number="0", user_name="no_name"):
               "\r\n\r\nRestCallEd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;" \
               " name=\"version\"\r\n\r\n1\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: " \
               "form-data; name=\"eventBody\"\r\n\r\n{\"intent\":\"carLoan\", \"lastConversation\":" \
-              + json.dumps(session_store[sid]) + ", \"phoneNumber\":" + number + ", \"UserName\":" + user_name + "}" \
+              + json.dumps(session_store[sid]) + ", \"phoneNumber\":\"" + number + "\", \"UserName\":\"" + user_name + "\"}" \
                                                                                                                  "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
 
     headers = {
