@@ -17,12 +17,19 @@
                         "no",
                         "no thanks",
                         "Stop",
+                        "no thank you"
+                    ]
+                },
+                {
+                    "name": "thank_you_call_back",
+                    "slots": [],
+                    "samples": [
                         "ok thank you",
                         "ok thanks",
+                        "thank you",
                         "sure",
                         "please",
                         "yes",
-                        "thank you",
                         "thanks"
                     ]
                 },
@@ -121,6 +128,16 @@
                 {
                     "name": "AMAZON.US_FIRST_NAME",
                     "values": [
+                        {
+                            "name": {
+                                "value": "Kuntal Shah"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Venky Adke"
+                            }
+                        },
                         {
                             "name": {
                                 "value": "Peter P"
